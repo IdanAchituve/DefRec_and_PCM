@@ -314,6 +314,6 @@ io.cprint('\n' + str(best_epoch_conf_mat))
 # Test
 #===================
 trgt_test_acc, trgt_test_loss, trgt_conf_mat = test(trgt_test_loader, model, "Target", "Test", 0)
-io.cprint("target test accuracy: %.4f, target test loss: %.4f" % (trgt_best_val_acc, trgt_best_val_loss))
+io.cprint("target test accuracy: %.4f, target test loss: %.4f" % (trgt_test_acc, trgt_best_val_loss))
 io.cprint("Test confusion matrix:")
 io.cprint('\n' + str(trgt_conf_mat))
