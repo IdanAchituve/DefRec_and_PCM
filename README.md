@@ -8,8 +8,7 @@
 Self-supervised learning (SSL) allows to learn useful representations from unlabeled data and has been applied effectively for domain adaptation (DA) on images. 
 It is still unknown if and how it can be leveraged for domain adaptation for 3D perception. Here we describe the first study of SSL for DA on point clouds. 
 We introduce a new family of pretext tasks, Deformation Reconstruction, motivated by the deformations encountered in sim-to-real transformations. 
-We define 3 types of shape deformation: (1) Volume-based: selecting a region based on proximity in the input space, (2) Feature-based: selecting regions that 
-are semantically similar, and (3) Sampling-based: selecting a region based on three simple sampling schemes. 
+We define 3 types of shape deformation: (1) Volume-based: deforming based on proximity in the input space, (2) Feature-based: deforming regions that are semantically similar, and (3) Sampling-based: deforming based on three simple sampling schemes. 
 As a separate contribution, we also develop a new method based on the Mixup training procedure for point-clouds. 
 Evaluations on six domain adaptations across synthetic and real furniture data, demonstrate large improvement over previous work.
 
