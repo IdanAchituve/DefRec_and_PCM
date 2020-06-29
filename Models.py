@@ -142,9 +142,9 @@ class PointNet(nn.Module):
         num_f_prev = 64 + 64 + 64 + 128
 
         self.C = classifier(args, num_class)
-        self.RegRec = RegionReconstruction(args, num_f_prev + 1024)
+        self.DefRec = RegionReconstruction(args, num_f_prev + 1024)
 
-    def forward(self, x, activate_RegRec=False):
+    def forward(self, x, activate_DefRec=False):
         num_points = x.size(2)
         x = torch.unsqueeze(x, dim=3)
 
@@ -174,9 +174,9 @@ class PointNet(nn.Module):
 
         logits["cls"] = self.C(x)
 
-        if activate_RegRec:
-            regrec_input = torch.cat((x_cat.squeeze(dim=3), x5.repeat(1, 1, num_points)), dim=1)
-            logits["RegRec"] = self.RegRec(regrec_input)
+        if activate_DefRec:
+            DefRec_input = torch.cat((x_cat.squeeze(dim=3), x5.repeat(1, 1, num_points)), dim=1)
+            logits["DefRec"] = self.DefRec(DefRec_input)
 
         return logits
 
@@ -199,9 +199,9 @@ class DGCNN(nn.Module):
         self.conv5 = nn.Conv1d(num_f_prev, 1024, kernel_size=1, bias=False)
 
         self.C = classifier(args, num_class)
-        self.RegRec = RegionReconstruction(args, num_f_prev + 1024)
+        self.DefRec = RegionReconstruction(args, num_f_prev + 1024)
 
-    def forward(self, x, activate_RegRec=False):
+    def forward(self, x, activate_DefRec=False):
         batch_size = x.size(0)
         num_points = x.size(2)
         logits = {}
@@ -245,9 +245,9 @@ class DGCNN(nn.Module):
 
         logits["cls"] = self.C(x)
 
-        if activate_RegRec:
-            regrec_input = torch.cat((x_cat, x5.unsqueeze(2).repeat(1, 1, num_points)), dim=1)
-            logits["RegRec"] = self.RegRec(regrec_input)
+        if activate_DefRec:
+            DefRec_input = torch.cat((x_cat, x5.unsqueeze(2).repeat(1, 1, num_points)), dim=1)
+            logits["DefRec"] = self.DefRec(DefRec_input)
 
         return logits
 

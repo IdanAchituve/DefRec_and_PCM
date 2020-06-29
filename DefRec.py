@@ -2,10 +2,10 @@ import numpy as np
 import torch
 import utils.pc_utils as pc_utils
 
-RegRec_SCALER = 8.0
+DefRec_SCALER = 8.0
 
 
-def deform_input(X, lookup, RegRec_dist='gaussian', device='cuda:0'):
+def deform_input(X, lookup, DefRec_dist='volume_based_voxels', device='cuda:0'):
     """
     Deform a region in the point cloud. For more details see https://arxiv.org/pdf/2003.12641.pdf
     Input:
@@ -26,7 +26,7 @@ def deform_input(X, lookup, RegRec_dist='gaussian', device='cuda:0'):
     mask = torch.zeros_like(X).to(device)  # binary mask of deformed points
 
     for b in range(X.shape[0]):
-        if RegRec_dist == 'point_collapse':
+        if DefRec_dist == 'volume_based_radius':
             X[b, :, :], indices = pc_utils.collapse_to_point(X[b, :, :], device)
             mask[b, :3, indices] = 1
         else:
@@ -37,17 +37,9 @@ def deform_input(X, lookup, RegRec_dist='gaussian', device='cuda:0'):
                     region = lookup[i].cpu().numpy()  # current region average point
                     mask[b, :3, ind] = 1
                     num_points = int(torch.sum(ind).cpu().numpy())
-                    if RegRec_dist == 'gaussian':
+                    if DefRec_dist == 'volume_based_voxels':
                         rnd_pts = pc_utils.draw_from_gaussian(region, num_points)
                         X[b, :3, ind] = torch.tensor(rnd_pts, dtype=torch.float).to(device)
-                    if RegRec_dist == 'uniform':
-                        gap = 1 / 2 * (2 / n)  # gap between region center and region limit
-                        rnd_pts = pc_utils.draw_from_uniform(gap, region, num_points)
-                        X[b, :3, ind] = torch.tensor(rnd_pts, dtype=torch.float).to(device)
-                    if RegRec_dist == 'gaussian_noise':
-                        noise = 0.01 * torch.randn(num_points).to(device)
-                        noise = noise.unsqueeze(0)
-                        X[b, :3, ind] += noise
                     break  # move to the next shape in the batch
     return X, mask
 
@@ -123,9 +115,9 @@ def reconstruction_loss(pred, gold, mask):
 
 def calc_loss(args, logits, labels, mask):
     """
-    Calc. RegRec loss.
+    Calc. DefRec loss.
     Return: loss 
     """
-    prediction = logits['RegRec']
-    loss = args.RegRec_weight * reconstruction_loss(prediction, labels, mask) * RegRec_SCALER
+    prediction = logits['DefRec']
+    loss = args.DefRec_weight * reconstruction_loss(prediction, labels, mask) * DefRec_SCALER
     return loss

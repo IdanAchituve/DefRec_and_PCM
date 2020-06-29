@@ -5,20 +5,21 @@
 </p> 
  
  ### Introduction
-Self-supervised learning (SSL) allows to learn useful representations from unlabeled data and has been applied effectively for domain adaptation (DA) on images. It is still unknown if and how it can be
-leveraged for domain adaptation for 3D perception. Here we describe the
-first study of SSL for DA on point-clouds. We introduce a new pretext
-task, Region Reconstruction, motivated by the deformations encountered
-in sim-to-real transformation. We also demonstrate how it can be combined with a training procedure motivated by the MixUp method. Evaluations on six domain adaptations across synthetic and real furniture
-data, demonstrate large improvement over previous work.
+Self-supervised learning (SSL) allows to learn useful representations from unlabeled data and has been applied effectively for domain adaptation (DA) on images. 
+It is still unknown if and how it can be leveraged for domain adaptation for 3D perception. Here we describe the first study of SSL for DA on point clouds. 
+We introduce a new family of pretext tasks, Deformation Reconstruction, motivated by the deformations encountered in sim-to-real transformations. 
+We define 3 types of shape deformation: (1) Volume-based: selecting a region based on proximity in the input space, (2) Feature-based: selecting regions that 
+are semantically similar, and (3) Sampling-based: selecting a region based on three simple sampling schemes. 
+As a separate contribution, we also develop a new method based on the Mixup training procedure for point-clouds. 
+Evaluations on six domain adaptations across synthetic and real furniture data, demonstrate large improvement over previous work.
 
 [[Paper]](https://arxiv.org/pdf/2003.12641.pdf)
 
 ### Instructions
 Clone repo and install it
 ```bash
-git clone https://github.com/idanachi/RegRec_and_PCM.git
-cd RegRec_and_PCM
+git clone https://github.com/idanachi/DefRec_and_PCM.git
+cd DefRec_and_PCM
 pip install -r requirements.txt
 ```
 
@@ -28,16 +29,16 @@ cd ./data
 python download.py
 ```
 
-Run PCM on source and RegRec on target
+Run PCM on source and DefRec on target
 ```bash
 cd ./scripts
-bash regrec_pcm_run.sh
+bash defrec_pcm_run.sh
 ```
 
-Run RegRec on both source and target (without PCM)
+Run DefRec on both source and target (without PCM)
 ```bash
 cd ./scripts
-bash regrec_run.sh
+bash defrec_run.sh
 ```
 
 
@@ -45,14 +46,14 @@ bash regrec_run.sh
 Please cite this paper if you want to use it in your work,
 ```
 @article{achituve2020self,
-  title={Self-Supervised Learning for Domain Adaptation on Point-Clouds},
+  title={Self-Supervised Learning for Domain Adaptation on Point Clouds},
   author={Achituve, Idan and Maron, Haggai and Chechik, Gal},
   journal={arXiv preprint arXiv:2003.12641},
   year={2020}
 }
 ```
  
-### Region Reconstruction
+### Shape Reconstruction
 <p align="center"> 
     <img src="./resources/reconstruction.png">
 </p> 

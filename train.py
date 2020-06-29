@@ -13,7 +13,7 @@ import utils.log
 from data.dataloader import ScanNet, ModelNet, ShapeNet, label_to_idx, NUM_POINTS
 from Models import PointNet, DGCNN
 from utils import pc_utils
-import RegRec
+import DefRec
 import PCM
 
 NWORKERS=4
@@ -39,7 +39,7 @@ def str2bool(v):
 # Argparse
 # ==================
 parser = argparse.ArgumentParser(description='DA on Point Clouds')
-parser.add_argument('--exp_name', type=str, default='RegRec_PCM',  help='Name of the experiment')
+parser.add_argument('--exp_name', type=str, default='DefRec_PCM',  help='Name of the experiment')
 parser.add_argument('--out_path', type=str, default='./experiments', help='log folder path')
 parser.add_argument('--dataroot', type=str, default='./data', metavar='N', help='data path')
 parser.add_argument('--src_dataset', type=str, default='shapenet', choices=['modelnet', 'shapenet', 'scannet'])
@@ -49,17 +49,17 @@ parser.add_argument('--model', type=str, default='dgcnn', choices=['pointnet', '
 parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
 parser.add_argument('--gpus', type=lambda s: [int(item.strip()) for item in s.split(',')], default='0',
                     help='comma delimited of gpu ids to use. Use "-1" for cpu usage')
-parser.add_argument('--RegRec_dist', type=str, default='gaussian', metavar='N',
-                    choices=['gaussian', 'uniform', 'gaussian_noise', 'point_collapse'],
+parser.add_argument('--DefRec_dist', type=str, default='volume_based_voxels', metavar='N',
+                    choices=['volume_based_voxels', 'volume_based_radius'],
                     help='distortion of points')
 parser.add_argument('--num_regions', type=int, default=3, help='number of regions to split shape by')
-parser.add_argument('--RegRec_on_src', type=str2bool, default=True, help='Using RegRec in source')
+parser.add_argument('--DefRec_on_src', type=str2bool, default=True, help='Using DefRec in source')
 parser.add_argument('--apply_PCM', type=str2bool, default=True, help='Using mixup in source')
 parser.add_argument('--batch_size', type=int, default=32, metavar='batch_size', help='Size of train batch per domain')
 parser.add_argument('--test_batch_size', type=int, default=32, metavar='batch_size', help='Size of test batch per domain')
 parser.add_argument('--optimizer', type=str, default='ADAM', choices=['ADAM', 'SGD'])
 parser.add_argument('--cls_weight', type=float, default=0.5, help='weight of the classification loss')
-parser.add_argument('--RegRec_weight', type=float, default=0.5, help='weight of the RegRec loss')
+parser.add_argument('--DefRec_weight', type=float, default=0.5, help='weight of the DefRec loss')
 parser.add_argument('--mixup_params', type=float, default=1.0, help='a,b in beta distribution')
 parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
 parser.add_argument('--momentum', type=float, default=0.9, help='SGD momentum')
@@ -185,7 +185,7 @@ def test(test_loader, model=None, set_type="Target", partition="Val", epoch=0):
             data = data.permute(0, 2, 1)
             batch_size = data.size()[0]
 
-            logits = model(data, activate_RegRec=False)
+            logits = model(data, activate_DefRec=False)
             loss = criterion(logits["cls"], labels)
             print_losses['cls'] += loss.item() * batch_size
 
@@ -210,6 +210,7 @@ def test(test_loader, model=None, set_type="Target", partition="Val", epoch=0):
 # ==================
 src_best_val_acc = trgt_best_val_acc = best_val_epoch = 0
 src_best_val_loss = trgt_best_val_loss = MAX_LOSS
+best_model = io.save_model(model)
 
 for epoch in range(args.epochs):
     model.train()
@@ -217,9 +218,9 @@ for epoch in range(args.epochs):
     # init data structures for saving epoch stats
     cls_type = 'mixup' if args.apply_PCM else 'cls'
     src_print_losses = {"total": 0.0, cls_type: 0.0}
-    if args.RegRec_on_src:
-        src_print_losses['RegRec'] = 0.0
-    trgt_print_losses = {'RegRec': 0.0}
+    if args.DefRec_on_src:
+        src_print_losses['DefRec'] = 0.0
+    trgt_print_losses = {'DefRec': 0.0}
     src_count = trgt_count = 0.0
 
     batch_idx = 1
@@ -235,18 +236,18 @@ for epoch in range(args.epochs):
             src_data_orig = src_data.clone()
             device = torch.device("cuda:" + str(src_data.get_device()) if args.cuda else "cpu")
 
-            if args.RegRec_on_src:
-                src_data, src_mask = RegRec.deform_input(src_data, lookup, args.RegRec_dist, device)
-                src_logits = model(src_data, activate_RegRec=True)
-                loss = RegRec.calc_loss(args, src_logits, src_data_orig, src_mask)
-                src_print_losses['RegRec'] += loss.item() * batch_size
+            if args.DefRec_on_src:
+                src_data, src_mask = DefRec.deform_input(src_data, lookup, args.DefRec_dist, device)
+                src_logits = model(src_data, activate_DefRec=True)
+                loss = DefRec.calc_loss(args, src_logits, src_data_orig, src_mask)
+                src_print_losses['DefRec'] += loss.item() * batch_size
                 src_print_losses['total'] += loss.item() * batch_size
                 loss.backward()
 
             if args.apply_PCM:
                 src_data = src_data_orig.clone()
                 src_data, mixup_vals = PCM.mix_shapes(args, src_data, src_label)
-                src_cls_logits = model(src_data, activate_RegRec=False)
+                src_cls_logits = model(src_data, activate_DefRec=False)
                 loss = PCM.calc_loss(args, src_cls_logits, mixup_vals, criterion)
                 src_print_losses['mixup'] += loss.item() * batch_size
                 src_print_losses['total'] += loss.item() * batch_size
@@ -255,7 +256,7 @@ for epoch in range(args.epochs):
             else:
                 src_data = src_data_orig.clone()
                 # predict with undistorted shape
-                src_cls_logits = model(src_data, activate_RegRec=False)
+                src_cls_logits = model(src_data, activate_DefRec=False)
                 loss = args.cls_weight * criterion(src_cls_logits["cls"], src_label)
                 src_print_losses['cls'] += loss.item() * batch_size
                 src_print_losses['total'] += loss.item() * batch_size
@@ -271,12 +272,12 @@ for epoch in range(args.epochs):
             trgt_data_orig = trgt_data.clone()
             device = torch.device("cuda:" + str(trgt_data.get_device()) if args.cuda else "cpu")
 
-            trgt_data, trgt_mask = RegRec.deform_input(trgt_data, lookup, args.RegRec_dist, device)
-            trgt_logits = model(trgt_data, activate_RegRec=True)
-            loss = RegRec.calc_loss(args, trgt_logits, trgt_data_orig, trgt_mask)
-            trgt_print_losses['RegRec'] += loss.item() * batch_size
+            trgt_data, trgt_mask = DefRec.deform_input(trgt_data, lookup, args.DefRec_dist, device)
+            trgt_logits = model(trgt_data, activate_DefRec=True)
+            loss = DefRec.calc_loss(args, trgt_logits, trgt_data_orig, trgt_mask)
+            trgt_print_losses['DefRec'] += loss.item() * batch_size
             loss.backward()
-            trgt_count += 1
+            trgt_count += batch_size
 
         opt.step()
         batch_idx += 1
@@ -303,6 +304,7 @@ for epoch in range(args.epochs):
         trgt_best_val_loss = trgt_val_loss
         best_val_epoch = epoch
         best_epoch_conf_mat = trgt_conf_mat
+        best_model = io.save_model(model)
 
 io.cprint("Best model was found at epoch %d, source validation accuracy: %.4f, source validation loss: %.4f,"
           "target validation accuracy: %.4f, target validation loss: %.4f"
@@ -313,6 +315,7 @@ io.cprint('\n' + str(best_epoch_conf_mat))
 #===================
 # Test
 #===================
+model = best_model
 trgt_test_acc, trgt_test_loss, trgt_conf_mat = test(trgt_test_loader, model, "Target", "Test", 0)
 io.cprint("target test accuracy: %.4f, target test loss: %.4f" % (trgt_test_acc, trgt_best_val_loss))
 io.cprint("Test confusion matrix:")

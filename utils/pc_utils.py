@@ -5,7 +5,7 @@ import numpy as np
 eps = 10e-4
 eps2 = 10e-6
 KL_SCALER = 10.0
-MIN_POINTS = 40
+MIN_POINTS = 20
 RADIUS = 0.5
 NREGIONS = 3
 

@@ -29,7 +29,7 @@ class IOStream():
         self.f.close()
 
     def save_model(self, model):
-        path = self.path + '/model.tar' % self.args.model_name
+        path = self.path + '/model.pt' % self.args.model_name
         best_model = copy.deepcopy(model)
         torch.save(model.state_dict(), path)
         return best_model
