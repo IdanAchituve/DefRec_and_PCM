@@ -50,5 +50,5 @@ def calc_loss(args, logits, mixup_vals, criterion):
     """
     Y_a, Y_b, lam = mixup_vals
     loss = lam * criterion(logits['cls'], Y_a) + (1 - lam) * criterion(logits['cls'], Y_b)
-    loss *= args.cls_weight
+    loss *= (1 - args.DefRec_weight)
     return loss

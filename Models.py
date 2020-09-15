@@ -287,6 +287,8 @@ class RegionReconstruction(nn.Module):
         self.bn1 = nn.BatchNorm1d(self.of1)
         self.bn2 = nn.BatchNorm1d(self.of2)
         self.bn3 = nn.BatchNorm1d(self.of3)
+        self.dp1 = nn.Dropout(p=args.dropout)
+        self.dp2 = nn.Dropout(p=args.dropout)
 
         self.conv1 = nn.Conv1d(input_size, self.of1, kernel_size=1, bias=False)
         self.conv2 = nn.Conv1d(self.of1, self.of2, kernel_size=1, bias=False)
@@ -294,8 +296,8 @@ class RegionReconstruction(nn.Module):
         self.conv4 = nn.Conv1d(self.of3, 3, kernel_size=1, bias=False)
 
     def forward(self, x):
-        x = F.leaky_relu(self.bn1(self.conv1(x)), negative_slope=0.2)
-        x = F.leaky_relu(self.bn2(self.conv2(x)), negative_slope=0.2)
-        x = F.leaky_relu(self.bn3(self.conv3(x)), negative_slope=0.2)
+        x = self.dp1(F.relu(self.bn1(self.conv1(x))))
+        x = self.dp2(F.relu(self.bn2(self.conv2(x))))
+        x = F.relu(self.bn3(self.conv3(x)))
         x = self.conv4(x)
         return x.permute(0, 2, 1)

@@ -58,7 +58,6 @@ parser.add_argument('--apply_PCM', type=str2bool, default=True, help='Using mixu
 parser.add_argument('--batch_size', type=int, default=32, metavar='batch_size', help='Size of train batch per domain')
 parser.add_argument('--test_batch_size', type=int, default=32, metavar='batch_size', help='Size of test batch per domain')
 parser.add_argument('--optimizer', type=str, default='ADAM', choices=['ADAM', 'SGD'])
-parser.add_argument('--cls_weight', type=float, default=0.5, help='weight of the classification loss')
 parser.add_argument('--DefRec_weight', type=float, default=0.5, help='weight of the DefRec loss')
 parser.add_argument('--mixup_params', type=float, default=1.0, help='a,b in beta distribution')
 parser.add_argument('--lr', type=float, default=1e-3, help='learning rate')
@@ -257,7 +256,7 @@ for epoch in range(args.epochs):
                 src_data = src_data_orig.clone()
                 # predict with undistorted shape
                 src_cls_logits = model(src_data, activate_DefRec=False)
-                loss = args.cls_weight * criterion(src_cls_logits["cls"], src_label)
+                loss = (1 - args.DefRec_weight) * criterion(src_cls_logits["cls"], src_label)
                 src_print_losses['cls'] += loss.item() * batch_size
                 src_print_losses['total'] += loss.item() * batch_size
                 loss.backward()
