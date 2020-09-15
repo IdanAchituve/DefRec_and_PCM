@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import utils.pc_utils as pc_utils
 
-DefRec_SCALER = 8.0
+DefRec_SCALER = 20.0
 
 
 def deform_input(X, lookup, DefRec_dist='volume_based_voxels', device='cuda:0'):
@@ -22,6 +22,7 @@ def deform_input(X, lookup, DefRec_dist='volume_based_voxels', device='cuda:0'):
     regions = pc_utils.assign_region_to_point(X, device)
 
     n = pc_utils.NREGIONS
+    min_pts = 40
     region_ids = np.random.permutation(n ** 3)
     mask = torch.zeros_like(X).to(device)  # binary mask of deformed points
 
@@ -33,7 +34,7 @@ def deform_input(X, lookup, DefRec_dist='volume_based_voxels', device='cuda:0'):
             for i in region_ids:
                 ind = regions[b, :] == i
                 # if there are enough points in the region
-                if torch.sum(ind) >= pc_utils.MIN_POINTS:
+                if torch.sum(ind) >= min_pts:
                     region = lookup[i].cpu().numpy()  # current region average point
                     mask[b, :3, ind] = 1
                     num_points = int(torch.sum(ind).cpu().numpy())
