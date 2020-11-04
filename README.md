@@ -37,7 +37,7 @@ Please cite this paper if you want to use it in your work,
 ```
  ### PointSegDA dataset
 <p align="center"> 
-    <img src="./resources/reconstruction.png">
+    <img src="./resources/PointSegDA.png">
 </p>
 
 ### Shape Reconstruction
