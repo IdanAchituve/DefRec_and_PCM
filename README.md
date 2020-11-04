@@ -35,7 +35,11 @@ Please cite this paper if you want to use it in your work,
   year={2020}
 }
 ```
- 
+ ### PointSegDA dataset
+<p align="center"> 
+    <img src="./resources/reconstruction.png">
+</p>
+
 ### Shape Reconstruction
 <p align="center"> 
     <img src="./resources/reconstruction.png">
