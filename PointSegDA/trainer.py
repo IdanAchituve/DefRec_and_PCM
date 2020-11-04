@@ -63,7 +63,7 @@ parser.add_argument('--min_pts', type=int, default=20, help='minimum number of p
 parser.add_argument('--num_regions', type=int, default=3, help='number of regions to split shape by')
 parser.add_argument('--noise_std', type=float, default=0.1, help='learning rate')
 parser.add_argument('--apply_PCM', type=str2bool, default=True, help='Using mixup in source')
-parser.add_argument('--DefRec_weight', type=float, default=0.5, help='weight of the DefRec loss')
+parser.add_argument('--DefRec_weight', type=float, default=0.05, help='weight of the DefRec loss')
 parser.add_argument('--mixup_params', type=float, default=1.0, help='a,b in beta distribution')
 
 args = parser.parse_args()
