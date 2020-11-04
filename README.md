@@ -14,26 +14,15 @@ Clone repo and install it
 ```bash
 git clone https://github.com/idanachi/DefRec_and_PCM.git
 cd DefRec_and_PCM
-pip install -r requirements.txt
+pip install -e .
 ```
 
 Download data:
 ```bash
-cd ./data
+cd ./xxx/data
 python download.py
 ```
-
-Run PCM on source and DefRec on target
-```bash
-cd ./scripts
-bash defrec_pcm_run.sh
-```
-
-Run DefRec on both source and target (without PCM)
-```bash
-cd ./scripts
-bash defrec_run.sh
-```
+Where xxx is the dataset (either PointDA or PointSegDA)
 
 
 ### Citation
