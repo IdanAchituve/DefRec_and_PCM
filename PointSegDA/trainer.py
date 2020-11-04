@@ -58,7 +58,7 @@ parser.add_argument('--dropout', type=float, default=0.5, help='dropout rate')
 parser.add_argument('--DefRec_dist', type=str, default='volume_based_radius', metavar='N',
                     choices=['volume_based_voxels', 'volume_based_radius'],
                     help='distortion of points')
-parser.add_argument('--radius', type=float, default=0.2, help='radius of the ball for reconstruction')
+parser.add_argument('--radius', type=float, default=0.3, help='radius of the ball for reconstruction')
 parser.add_argument('--min_pts', type=int, default=20, help='minimum number of points per region')
 parser.add_argument('--num_regions', type=int, default=3, help='number of regions to split shape by')
 parser.add_argument('--noise_std', type=float, default=0.1, help='learning rate')
