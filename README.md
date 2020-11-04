@@ -37,12 +37,12 @@ Please cite this paper if you want to use it in your work,
 ```
  ### PointSegDA dataset
 <p align="center"> 
-    <img src="./resources/PointSegDA.png"=125x125>
+    <img src="./resources/PointSegDA.png" width=150 height=150>
 </p>
 
 ### Shape Reconstruction
 <p align="center"> 
-    <img src="./resources/reconstruction.png"=125x125>
+    <img src="./resources/reconstruction.png" width=150 height=150>
 </p> 
  
  
