@@ -4,7 +4,7 @@ import copy
 import torch
 import os
 import sklearn.metrics as metrics
-from data.dataloader import label_to_idx
+from PointDA.data.dataloader import label_to_idx
 
 
 class IOStream():

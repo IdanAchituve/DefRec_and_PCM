@@ -206,21 +206,12 @@ class DGCNN(nn.Module):
         num_points = x.size(2)
         logits = {}
 
-        # returns a tensor of (batch_size, 6, #points, #neighboors)
-        # interpretation: each point is represented by 20 vectors, each of size 6
         x0 = get_graph_feature(x, self.args, k=self.k)
-        # align to a canonical space (e.g., apply rotation such that all inputs will have the same rotation)
         transformd_x0 = self.input_transform_net(x0)
         x = torch.matmul(transformd_x0, x)
 
-        # returns a tensor of (batch_size, 6, #points, #neighboors)
-        # interpretation: each point is represented by 20 NN, each of size 6
         x = get_graph_feature(x, self.args, k=self.k)
-        # process point and inflate it from 6 to e.g., 64
         x = self.conv1(x)
-        # per each feature (from e.g., 64) take the max value from the representative vectors
-        # Conceptually this means taking the neighbor that gives the highest feature value.
-        # returns a tensor of size e.g., (batch_size, 64, #points)
         x1 = x.max(dim=-1, keepdim=False)[0]
 
         x = get_graph_feature(x1, self.args, k=self.k)

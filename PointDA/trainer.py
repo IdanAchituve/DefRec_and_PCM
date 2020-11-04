@@ -10,11 +10,10 @@ import sklearn.metrics as metrics
 import argparse
 import copy
 import utils.log
-from data.dataloader import ScanNet, ModelNet, ShapeNet, label_to_idx, NUM_POINTS
-from Models import PointNet, DGCNN
+from PointDA.data.dataloader import ScanNet, ModelNet, ShapeNet, label_to_idx
+from PointDA.Models import PointNet, DGCNN
 from utils import pc_utils
-import DefRec
-import PCM
+from DefRec_and_PCM import DefRec, PCM
 
 NWORKERS=4
 MAX_LOSS = 9 * (10**9)

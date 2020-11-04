@@ -1,3 +1,6 @@
 PointDA_data/
 .idea/
 __pycache__/
+PointSegDAdataset/
+DefRec_and_PCM.egg-info/
+experiments/
