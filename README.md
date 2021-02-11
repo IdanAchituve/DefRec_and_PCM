@@ -28,11 +28,12 @@ Where xxx is the dataset (either PointDA or PointSegDA)
 ### Citation
 Please cite this paper if you want to use it in your work,
 ```
-@article{achituve2020self,
+@inproceedings{achituve2021self,
   title={Self-Supervised Learning for Domain Adaptation on Point Clouds},
   author={Achituve, Idan and Maron, Haggai and Chechik, Gal},
-  journal={arXiv preprint arXiv:2003.12641},
-  year={2020}
+  booktitle={Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision},
+  pages={123--133},
+  year={2021}
 }
 ```
  ### PointSegDA dataset
