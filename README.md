@@ -12,7 +12,7 @@ Self-supervised learning (SSL) allows to learn useful representations from unlab
 ### Instructions
 Clone repo and install it
 ```bash
-git clone https://github.com/idanachi/DefRec_and_PCM.git
+git clone https://github.com/IdanAchituve/DefRec_and_PCM.git
 cd DefRec_and_PCM
 pip install -e .
 ```
