@@ -52,7 +52,7 @@ parser.add_argument('--DefRec_dist', type=str, default='volume_based_voxels', me
                     choices=['volume_based_voxels', 'volume_based_radius'],
                     help='distortion of points')
 parser.add_argument('--num_regions', type=int, default=3, help='number of regions to split shape by')
-parser.add_argument('--DefRec_on_src', type=str2bool, default=True, help='Using DefRec in source')
+parser.add_argument('--DefRec_on_src', type=str2bool, default=False, help='Using DefRec in source')
 parser.add_argument('--apply_PCM', type=str2bool, default=True, help='Using mixup in source')
 parser.add_argument('--batch_size', type=int, default=32, metavar='batch_size', help='Size of train batch per domain')
 parser.add_argument('--test_batch_size', type=int, default=32, metavar='batch_size', help='Size of test batch per domain')
