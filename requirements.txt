@@ -1,5 +1,5 @@
 brotlipy==0.7.0
-certifi==2020.6.20
+certifi==2022.12.7
 cffi==1.14.3
 chardet==3.0.4
 cryptography==3.3.2
